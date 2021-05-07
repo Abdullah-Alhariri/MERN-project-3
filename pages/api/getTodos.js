@@ -1,13 +1,19 @@
-import { table, minifyRecords } from "./utils/Airtable";
+import { table, getMinifiedRecord, minifyRecords } from './utils/airtable.js';
 
+//TODO: require authentication
 export default async (req, res) => {
-  try {
-    const records = await table.select({}).firstPage();
-    const minifiedRecords = minifyRecords(records);
-    res.status = 200;
-    res.json(minifiedRecords);
-  } catch (err) {
-    res.status = 500;
-    res.json({ msg: "Something went wrong" });
-  }
+    //TODO: get logged in user
+    const user = {};
+    try {
+        const records = await table
+            .select({ filterByFormula: `userId = '${user.sub}'` })
+            .firstPage();
+        const formattedRecords = minifyRecords(records);
+        res.statusCode = 200;
+        res.json(formattedRecords);
+    } catch (error) {
+        console.error(error);
+        res.statusCode = 500;
+        res.json({ msg: 'Something went wrong' });
+    }
 };

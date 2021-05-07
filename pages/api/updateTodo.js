@@ -1,14 +1,20 @@
-import { table, getminifiedRecord } from "./utils/Airtable";
+import { table } from './utils/airtable.js';
 
+//TODO: require authentication
 export default async (req, res) => {
-  const { id, fields } = req.body;
+    //TODO: get logged in userc
+    const user = {};
 
-  try {
-    const updatedRecords = await table.update([{ id, fields }]);
-    res.status = 200;
-    res.json(getminifiedRecord(updatedRecords[0]));
-  } catch (err) {
-    res.status = 500;
-    res.json({ msg: "Something went wrong" });
-  }
+    const { id, fields } = req.body;
+
+    try {
+        const newFields = { ...fields, userId: user.sub };
+        const updatedRecord = await table.update([{ id, fields: newFields }]);
+        res.statusCode = 200;
+        res.json(updatedRecord);
+    } catch (error) {
+        console.error(error);
+        res.statusCode = 500;
+        res.json({ msg: 'Something went wrong' });
+    }
 };
